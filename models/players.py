@@ -1,9 +1,7 @@
 """
 players.py
 
-Définit les classes liées aux joueurs :
-    - Player : représente un joueur avec ses informations personnelles
-               et son appartenance à une équipe.
+Définit la classe Player représentant un joueur inscrit dans le tournoi.
 """
 from __future__ import annotations
 
@@ -11,7 +9,7 @@ from datetime import date
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from models.teams import Team
+    from .teams import Team
 
 
 class Player:
@@ -19,11 +17,12 @@ class Player:
     Représente un joueur inscrit dans le tournoi.
 
     Attributes:
-        license_number (str)  : Numéro de licence unique du joueur.
-        name           (str)  : Nom complet du joueur.
-        date_of_birth  (date) : Date de naissance (objet datetime.date).
-        handed         (str)  : Latéralité du joueur ('left', 'right', ou None).
-        _team          (Team) : Référence privée vers l'équipe du joueur (None si sans équipe).
+        license_number (str)        : Numéro de licence unique du joueur.
+        name           (str)        : Nom complet du joueur.
+        date_of_birth  (date)       : Date de naissance (datetime.date).
+        handed         (str | None) : Latéralité du joueur ('left', 'right', ou None).
+        points         (float)      : Points accumulés dans la phase en cours.
+        _team          (Team | None): Référence privée vers l'équipe du joueur.
     """
 
     def __init__(
@@ -49,10 +48,6 @@ class Player:
         self.points         = 0.0
         self._team: Team | None = None
 
-    # ------------------------------------------------------------------
-    # Propriétés
-    # ------------------------------------------------------------------
-
     @property
     def team(self) -> Team | None:
         """Retourne l'équipe à laquelle appartient le joueur, ou None."""
@@ -74,10 +69,6 @@ class Player:
         today = date.today()
         dob   = self.date_of_birth
         return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-
-    # ------------------------------------------------------------------
-    # Représentation
-    # ------------------------------------------------------------------
 
     def __repr__(self) -> str:
         team_name = self._team.name if self._team else "No team"

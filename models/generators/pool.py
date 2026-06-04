@@ -4,22 +4,23 @@ generators/pool.py
 Générateur de matchs pour le format poules (round-robin).
 
 Logique :
-    - Les participants sont mélangés aléatoirement puis répartis
-      en poules équilibrées.
+    - Les participants sont mélangés aléatoirement puis répartis en poules équilibrées.
     - Si le nombre de participants n'est pas divisible par num_pools,
       les premières poules reçoivent un participant supplémentaire.
-    - Dans chaque poule, chaque participant affronte tous les autres
-      une fois (round-robin aller simple).
+    - Dans chaque poule, chaque participant affronte tous les autres une fois.
 """
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import Union, TYPE_CHECKING
 
-from models.match import Match
+from ..match import Match
 
 if TYPE_CHECKING:
-    from models.match import Participant
+    from ..teams   import Team
+    from ..players import Player
+
+Participant = Union["Team", "Player"]
 
 
 def generate(
@@ -52,7 +53,7 @@ def generate(
             f"{n} participants (minimum 2 par poule)."
         )
 
-    shuffled = participants[:]
+    shuffled  = participants[:]
     random.shuffle(shuffled)
 
     base_size = n // num_pools

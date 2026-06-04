@@ -13,12 +13,12 @@ from __future__ import annotations
 from datetime import date
 from typing import Union, TYPE_CHECKING
 
-from models.config import ParticipantType, TournamentType
-from models.phase  import Phase
+from .config import ParticipantType, TournamentType
+from .phase  import Phase
 
 if TYPE_CHECKING:
-    from models.teams   import Team
-    from models.players import Player
+    from .teams   import Team
+    from .players import Player
 
 Participant = Union["Team", "Player"]
 
@@ -76,8 +76,8 @@ class Tournament:
             TypeError : Si le type du participant ne correspond pas à participant_type.
             ValueError: Si le participant est déjà inscrit.
         """
-        from teams   import Team
-        from players import Player
+        from .teams   import Team
+        from .players import Player
 
         expected = Team if self.participant_type == ParticipantType.TEAM else Player
         if not isinstance(participant, expected):
@@ -115,15 +115,15 @@ class Tournament:
         """
         Ajoute une nouvelle phase au tournoi et génère ses matchs.
 
-        Par défaut, la phase utilise les qualifiés de la phase précédente.
-        Pour la première phase, tous les participants inscrits sont utilisés.
-
         Args:
             name                         (str)            : Nom de la phase.
             tournament_type              (TournamentType) : Format de la phase.
-            num_qualifiers               (int)            : Qualifiés pour la phase suivante. 0 = phase finale.
+            num_qualifiers               (int)            : Qualifiés pour la phase suivante.
+                                                            0 = phase finale.
             num_pools                    (int)            : Nombre de poules (format POOL).
-            use_qualifiers_from_previous (bool)           : Si True, utilise les qualifiés de la phase précédente. Si False, utilise tous les inscrits.
+            use_qualifiers_from_previous (bool)           : Si True, utilise les qualifiés
+                                                            de la phase précédente.
+                                                            Si False, utilise tous les inscrits.
 
         Returns:
             Phase: La phase créée et ajoutée au tournoi.

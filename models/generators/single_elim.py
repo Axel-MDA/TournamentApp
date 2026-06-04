@@ -6,20 +6,21 @@ Générateur de matchs pour le format élimination directe simple.
 Logique :
     - Les participants sont mélangés aléatoirement (tirage au sort).
     - Ils sont appariés deux par deux pour constituer le premier tour.
-    - Si le nombre de participants est impair, le dernier reçoit un bye
-      (qualification automatique au tour suivant sans jouer).
-    - Les tours suivants sont générés via next_round() après saisie
-      des résultats du tour précédent.
+    - Si le nombre de participants est impair, le dernier reçoit un bye.
+    - Les tours suivants sont générés via next_round() après saisie des résultats.
 """
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import Union, TYPE_CHECKING
 
-from models.match import Match
+from ..match import Match
 
 if TYPE_CHECKING:
-    from models.match import Participant
+    from ..teams   import Team
+    from ..players import Player
+
+Participant = Union["Team", "Player"]
 
 
 def generate(participants: list[Participant]) -> list[Match]:

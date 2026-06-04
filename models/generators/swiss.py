@@ -5,22 +5,23 @@ Générateur de matchs pour le système suisse.
 
 Logique :
     - Le premier tour est tiré au sort aléatoirement.
-    - Les tours suivants apparient les participants aux scores les plus proches
-      (du premier au dernier du classement, deux par deux).
+    - Les tours suivants apparient les participants aux scores les plus proches.
     - Un participant ne peut pas affronter deux fois le même adversaire.
       Si un appariement idéal est impossible, on décale d'un rang.
-    - Le nombre de tours est libre — c'est l'organisateur qui décide
-      quand arrêter et appeler standings() pour le classement final.
+    - Le nombre de tours est libre — c'est l'organisateur qui décide quand arrêter.
 """
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import Union, TYPE_CHECKING
 
-from models.match import Match
+from ..match import Match
 
 if TYPE_CHECKING:
-    from models.match import Participant
+    from ..teams   import Team
+    from ..players import Player
+
+Participant = Union["Team", "Player"]
 
 
 def generate(participants: list[Participant]) -> list[Match]:
@@ -56,13 +57,12 @@ def next_round(
     """
     Génère le prochain tour du système suisse.
 
-    Apparie les participants par scores décroissants en évitant
-    les rematches. Si un appariement idéal est impossible, on décale
-    d'un rang jusqu'à trouver un adversaire valide.
+    Apparie les participants par scores décroissants en évitant les rematches.
+    Si un appariement idéal est impossible, on décale d'un rang.
 
     Args:
-        participants          (list[Participant]) : Tous les participants de la phase.
-        all_previous_matches  (list[Match])       : Tous les matchs déjà joués dans la phase.
+        participants         (list[Participant]) : Tous les participants de la phase.
+        all_previous_matches (list[Match])       : Tous les matchs déjà joués.
 
     Returns:
         list[Match]: Les matchs du prochain tour.
@@ -76,14 +76,13 @@ def next_round(
             f"{len(unfinished)} match(s) du tour précédent ne sont pas encore terminés."
         )
 
-    already_played = _build_history(all_previous_matches)
-
+    already_played      = _build_history(all_previous_matches)
     sorted_participants = sorted(participants, key=lambda p: p.points, reverse=True)
-    remaining          = sorted_participants[:]
+    remaining           = sorted_participants[:]
     matches: list[Match] = []
 
     while len(remaining) >= 2:
-        p1 = remaining.pop(0)
+        p1     = remaining.pop(0)
         paired = False
 
         for i, p2 in enumerate(remaining):

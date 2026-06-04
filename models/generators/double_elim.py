@@ -7,29 +7,25 @@ Logique :
     - Deux brackets coexistent : le winner bracket et le loser bracket.
     - Un participant est éliminé seulement après deux défaites.
     - Les perdants du winner bracket tombent dans le loser bracket.
-    - Le vainqueur du loser bracket affronte le vainqueur du winner bracket
-      en grande finale.
-
-Structure interne :
-    - winner_matches : matchs du bracket gagnants.
-    - loser_matches  : matchs du bracket perdants.
-    - Les deux listes sont gérées séparément et progressent en parallèle.
+    - Le vainqueur du loser bracket affronte le vainqueur du winner bracket en grande finale.
 """
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import Union, TYPE_CHECKING
 
-from models.match import Match
+from ..match import Match
 
 if TYPE_CHECKING:
-    from models.match import Participant
+    from ..teams   import Team
+    from ..players import Player
+
+Participant = Union["Team", "Player"]
 
 
 def generate(participants: list[Participant]) -> tuple[list[Match], list[Match]]:
     """
     Génère le premier tour du winner bracket.
-    Le loser bracket est vide au départ — il se peuple via next_round().
 
     Args:
         participants (list[Participant]): Participants du tournoi.
@@ -135,14 +131,9 @@ def _check_all_finished(matches: list[Match]) -> None:
     """
     Vérifie que tous les matchs d'une liste sont terminés.
 
-    Args:
-        matches (list[Match]): Liste de matchs à vérifier.
-
     Raises:
         RuntimeError: Si au moins un match n'est pas terminé.
     """
     unfinished = [m for m in matches if m.state != "Finished"]
     if unfinished:
-        raise RuntimeError(
-            f"{len(unfinished)} match(s) ne sont pas encore terminés."
-        )
+        raise RuntimeError(f"{len(unfinished)} match(s) ne sont pas encore terminés.")

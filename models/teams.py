@@ -5,7 +5,7 @@ Définit la classe Team représentant une équipe dans le tournoi.
 """
 from __future__ import annotations
 
-from models.players import Player
+from .players import Player
 
 
 class Team:
@@ -25,10 +25,12 @@ class Team:
         Initialise une équipe.
 
         Args:
-            name   (str)                        : Nom de l'équipe.
-            club   (str)                        : Club d'appartenance.
-            city   (str)                        : Ville de l'équipe.
-            mates  (dict[int, Player] | None)   : Joueurs initiaux sous la forme {numéro_maillot: Player}. Dictionnaire vide par défaut.
+            name  (str)                      : Nom de l'équipe.
+            club  (str)                      : Club d'appartenance.
+            city  (str)                      : Ville de l'équipe.
+            mates (dict[int, Player] | None) : Joueurs initiaux sous la forme
+                                               {numéro_maillot: Player}.
+                                               Dictionnaire vide par défaut.
         """
         self.name   = name
         self.club   = club
@@ -36,14 +38,12 @@ class Team:
         self.mates  = mates if mates is not None else {}
         self.points = 0.0
 
-        # Affecte la référence d'équipe à chaque joueur déjà présent
         for player in self.mates.values():
             player.team = self
 
     def add_player(self, player: Player, number: int) -> None:
         """
         Ajoute un joueur à l'équipe avec son numéro de maillot.
-        Met automatiquement à jour la référence team du joueur.
 
         Args:
             player (Player) : Le joueur à ajouter.
@@ -63,7 +63,6 @@ class Team:
     def remove_player(self, player: Player) -> None:
         """
         Retire un joueur de l'équipe.
-        Réinitialise la référence team du joueur à None.
 
         Args:
             player (Player): Le joueur à retirer.
@@ -152,8 +151,7 @@ class Team:
 
     def roster(self) -> str:
         """
-        Retourne la composition de l'équipe sous forme lisible,
-        triée par numéro de maillot.
+        Retourne la composition de l'équipe sous forme lisible, triée par numéro de maillot.
 
         Returns:
             str: La liste des joueurs avec leur numéro, un par ligne.

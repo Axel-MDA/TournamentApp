@@ -7,13 +7,12 @@ Un participant peut être une équipe (Team) ou un joueur individuel (Player).
 from __future__ import annotations
 
 from typing import Union, TYPE_CHECKING
-import models.config as cfg
+from . import config as cfg
 
 if TYPE_CHECKING:
-    from models.players import Player
-    from models.teams   import Team
+    from .teams   import Team
+    from .players import Player
 
-# Type union pour représenter un participant (équipe ou joueur individuel)
 Participant = Union["Team", "Player"]
 
 
@@ -45,10 +44,6 @@ class Match:
         self.score     = [0, 0]
         self.state     = "About to start"
 
-    # ------------------------------------------------------------------
-    # Gestion du score et de l'état
-    # ------------------------------------------------------------------
-
     def set_score(self, score_a: int, score_b: int) -> None:
         """
         Définit le score du match.
@@ -78,10 +73,6 @@ class Match:
             raise ValueError(f"État invalide : {state!r}. Valeurs acceptées : {self.STATES}")
         self.state = state
 
-    # ------------------------------------------------------------------
-    # Logique de points
-    # ------------------------------------------------------------------
-
     def update_points(self) -> None:
         """
         Met à jour les points des deux participants selon le résultat du match.
@@ -95,12 +86,10 @@ class Match:
         if self.state == "About to start":
             print("Le match n'a pas encore commencé.")
             return
-
         if self.state == "In progress":
             print("Le match est en cours.")
             return
 
-        # state == "Finished"
         a, b             = self.opponents
         score_a, score_b = self.score
 
@@ -108,20 +97,14 @@ class Match:
             print(f"{a.name} a gagné.")
             a.points += cfg.WIN_POINT
             b.points += cfg.LOOSE_POINT
-
         elif score_b > score_a:
             print(f"{b.name} a gagné.")
             a.points += cfg.LOOSE_POINT
             b.points += cfg.WIN_POINT
-
         else:
             print(f"Match nul entre {a.name} et {b.name}.")
             a.points += cfg.DRAW_POINT
             b.points += cfg.DRAW_POINT
-
-    # ------------------------------------------------------------------
-    # Propriétés calculées
-    # ------------------------------------------------------------------
 
     @property
     def winner(self) -> Participant | None:
@@ -138,10 +121,6 @@ class Match:
         if self.score[1] > self.score[0]:
             return self.opponents[1]
         return None
-
-    # ------------------------------------------------------------------
-    # Représentation
-    # ------------------------------------------------------------------
 
     def __repr__(self) -> str:
         a, b = self.opponents

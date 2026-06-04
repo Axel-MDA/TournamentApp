@@ -11,16 +11,16 @@ from __future__ import annotations
 
 from typing import Union, TYPE_CHECKING
 
-from models.config import TournamentType
-from models.match  import Match
-import generators.pool      as gen_pool
-import generators.single_elim as gen_single_elim
-import generators.double_elim as gen_double_elim
-import generators.swiss        as gen_swiss
+from .config import TournamentType
+from .match  import Match
+from .generators import pool        as gen_pool
+from .generators import single_elim as gen_single_elim
+from .generators import double_elim as gen_double_elim
+from .generators import swiss       as gen_swiss
 
 if TYPE_CHECKING:
-    from models.teams   import Team
-    from models.players import Player
+    from .teams   import Team
+    from .players import Player
 
 Participant = Union["Team", "Player"]
 
@@ -51,12 +51,12 @@ class Phase:
         Initialise une phase et génère automatiquement ses matchs.
 
         Args:
-            name             (str)              : Nom de la phase.
-            tournament_type  (TournamentType)   : Format de la phase.
-            participants     (list[Participant]): Participants de la phase.
-            num_qualifiers   (int)              : Nombre de qualifiés pour la suite.
-                                                  0 signifie phase finale.
-            num_pools        (int)              : Nombre de poules (format POOL uniquement).
+            name             (str)               : Nom de la phase.
+            tournament_type  (TournamentType)    : Format de la phase.
+            participants     (list[Participant]) : Participants de la phase.
+            num_qualifiers   (int)               : Nombre de qualifiés pour la suite.
+                                                   0 signifie phase finale.
+            num_pools        (int)               : Nombre de poules (format POOL uniquement).
 
         Raises:
             ValueError: Si la liste de participants est vide.
@@ -104,11 +104,11 @@ class Phase:
     def next_round(self) -> None:
         """
         Génère le tour suivant pour les formats multi-tours (SWISS, élimination directe).
-        Pour POOL, tous les matchs sont générés dès le départ — cette méthode n'est pas applicable.
+        Pour POOL, tous les matchs sont générés dès le départ.
 
         Raises:
             RuntimeError: Si des matchs du tour en cours ne sont pas encore terminés.
-            RuntimeError: Si le format est POOL (pas de notion de tour suivant).
+            RuntimeError: Si le format est POOL.
         """
         if self.tournament_type == TournamentType.POOL:
             raise RuntimeError("Le format POOL génère tous les matchs dès le départ.")
@@ -132,7 +132,6 @@ class Phase:
         unfinished = [m for m in self.matches if m.state != "Finished"]
         if unfinished:
             return unfinished
-
         tour_size = len(self.participants) // 2
         return self.matches[-tour_size:]
 
