@@ -18,12 +18,26 @@ TournamentApp/
 │       ├── single_elim.py     → fonctionnement des élimination directe
 │       ├── swiss.py           → fonctionnement des swiss
 │       └── pool.py            → fonctionnement des poules
-└── cli/
+├── cli/
+│   ├── __init__.py
+│   ├── app.py                 → boucle principale + menu
+│   ├── tournament_ui.py       → créer un tournoi, résumé
+│   ├── participant_ui.py      → inscrire joueurs / équipes
+│   ├── phase_ui.py            → ajouter une phase, tour suivant
+│   ├── match_ui.py            → résultats, classement, matchs
+│   └── utils.py               → input_int, input_str, input_yn, choose...
+└── ui/
     ├── __init__.py
-    ├── app.py                 → boucle principale + menu
-    ├── tournament_ui.py       → créer un tournoi, résumé
-    ├── participant_ui.py      → inscrire joueurs / équipes
-    ├── phase_ui.py            → ajouter une phase, tour suivant
-    ├── match_ui.py            → résultats, classement, matchs
-    └── utils.py               → input_int, input_str, input_yn, choose...
+    ├── main_window.py
+    ├── style.py
+    ├── widgets/
+    │   ├── __init__.py
+    │   └── sidebar.py
+    └── views/
+        ├── __init__.py
+        ├── home_view.py
+        ├── participants_view.py
+        ├── phase_view.py
+        ├── matches_view.py
+        └── standings_view.py
 ```
