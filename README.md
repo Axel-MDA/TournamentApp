@@ -1,7 +1,7 @@
 # TournamentApp
 A full-stack tournament management application — create brackets, manage players, track scores and results in real time.
 
-
+'''
 TournamentApp/
 ├── main.py                    
 ├── models/
@@ -26,3 +26,4 @@ TournamentApp/
     ├── phase_ui.py            → ajouter une phase, tour suivant
     ├── match_ui.py            → résultats, classement, matchs
     └── utils.py               → input_int, input_str, input_yn, choose...
+'''
