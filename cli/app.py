@@ -1,13 +1,13 @@
 """
-cli/app.py
+cli/app.py  (version avec sauvegarde / chargement)
 
 Boucle principale de l'application et menu principal.
-Orchestre les différents modules CLI.
+Orchestre les différents modules CLI, incluant la sauvegarde JSON.
 """
 from __future__ import annotations
 
 from models.tournament import Tournament
-from .tournament_ui  import create_tournament, show_summary
+from .tournament_ui  import create_tournament, show_summary, save_current_tournament
 from .participant_ui import register_participants
 from .phase_ui       import add_phase, next_round
 from .match_ui       import enter_results, show_standings, show_matches
@@ -22,20 +22,23 @@ _MENU_OPTIONS = [
     ("Classement",                 show_standings),
     ("Voir les matchs",            show_matches),
     ("Résumé complet",             show_summary),
+    ("💾  Sauvegarder le tournoi", save_current_tournament),   # ← nouveau
 ]
 
 
 def run():
     """
     Point d'entrée de l'application.
-    Crée le tournoi puis lance la boucle principale.
+    Crée (ou charge) le tournoi puis lance la boucle principale.
     """
     _print_banner()
-    tournament = create_tournament()
+    tournament = create_tournament()   # propose maintenant Créer ou Charger
 
     while _main_menu(tournament):
         pass
 
+    # Propose une sauvegarde automatique en quittant
+    _auto_save_on_exit(tournament)
     print("\nÀ bientôt !")
 
 
@@ -89,3 +92,10 @@ def _print_status(tournament: Tournament):
         f" | Phases : {len(tournament.phases)}"
         f"{phase_info}"
     )
+
+
+def _auto_save_on_exit(tournament: Tournament):
+    """Propose une sauvegarde automatique avant de quitter."""
+    answer = input("\nSauvegarder avant de quitter ? (o/n) : ").strip().lower()
+    if answer == "o":
+        save_current_tournament(tournament)
