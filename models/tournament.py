@@ -111,6 +111,7 @@ class Tournament:
         num_qualifiers: int = 0,
         num_pools: int = 2,
         use_qualifiers_from_previous: bool = True,
+        seeded: list[Participant] | None = None,
     ) -> Phase:
         """
         Ajoute une nouvelle phase au tournoi et génère ses matchs.
@@ -124,6 +125,15 @@ class Tournament:
             use_qualifiers_from_previous (bool)           : Si True, utilise les qualifiés
                                                             de la phase précédente.
                                                             Si False, utilise tous les inscrits.
+            seeded                       (list[Participant] | None): Liste de participants
+                                                            (ex: qualifiés de la phase
+                                                            précédente, classés) à utiliser
+                                                            en priorité comme têtes de série.
+                                                            Si fourni, ils sont placés en
+                                                            tête de la liste des participants
+                                                            de la phase, dans cet ordre.
+                                                            Les générateurs de matchs restent
+                                                            libres de les mélanger ensuite.
 
         Returns:
             Phase: La phase créée et ajoutée au tournoi.
@@ -149,6 +159,13 @@ class Tournament:
                 )
         else:
             phase_participants = self.participants[:]
+
+        if seeded:
+            # Place les participants "seeded" en tête, dans l'ordre fourni,
+            # puis ajoute le reste des participants de la phase (sans doublon).
+            seeded_in_phase = [p for p in seeded if p in phase_participants]
+            rest            = [p for p in phase_participants if p not in seeded_in_phase]
+            phase_participants = seeded_in_phase + rest
 
         phase = Phase(
             name            = name,
