@@ -273,8 +273,9 @@ def _phase_from_dict(data: dict, registry: dict) -> Phase:
         for m_data in data.get("matches", [])
     ]
 
-    # Attribut optionnel utilisé dans matches_view
-    phase._bye_participants = []
+    # Recalcule les byes à partir de l'état réel des matchs rechargés
+    # (plutôt que de mettre une liste vide en dur)
+    phase._update_byes()
 
     return phase
 

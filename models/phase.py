@@ -76,11 +76,13 @@ class Phase:
         self.num_qualifiers  = num_qualifiers
         self.matches: list[Match]             = []
         self.pools:   list[list[Participant]] = []
+        self._bye_participants: list[Participant] = []
 
         for p in self.participants:
             p.points = 0.0
 
         self._generate_matches(num_pools)
+        self._update_byes()
 
     def _generate_matches(self, num_pools: int) -> None:
         """
@@ -101,15 +103,21 @@ class Phase:
         elif self.tournament_type == TournamentType.SWISS:
             self.matches = gen_swiss.generate(self.participants)
 
-    def next_round(self) -> None:
+    def next_round(self) -> list[Match]:
         """
         Génère le tour suivant pour les formats multi-tours (SWISS, élimination directe).
         Pour POOL, tous les matchs sont générés dès le départ.
+
+        Returns:
+            list[Match]: Les nouveaux matchs générés pour ce tour
+                        (liste vide pour POOL ou DOUBLE_ELIM, non gérés ici).
 
         Raises:
             RuntimeError: Si des matchs du tour en cours ne sont pas encore terminés.
             RuntimeError: Si le format est POOL.
         """
+        new_matches: list[Match] = []
+
         if self.tournament_type == TournamentType.POOL:
             raise RuntimeError("Le format POOL génère tous les matchs dès le départ.")
 
@@ -121,6 +129,9 @@ class Phase:
         elif self.tournament_type == TournamentType.SWISS:
             new_matches = gen_swiss.next_round(self.participants, self.matches)
             self.matches.extend(new_matches)
+
+        self._update_byes()
+        return new_matches
 
     def _current_tour_matches(self) -> list[Match]:
         """
@@ -134,6 +145,70 @@ class Phase:
             return unfinished
         tour_size = len(self.participants) // 2
         return self.matches[-tour_size:]
+
+    @property
+    def is_round_complete(self) -> bool:
+        """
+        Retourne True si tous les matchs du tour en cours sont terminés
+        (utile pour les formats multi-tours : SINGLE_ELIM, SWISS).
+        Pour POOL et DOUBLE_ELIM, équivaut à is_complete.
+        """
+        if not self.matches:
+            return False
+        current_tour = self._current_tour_matches()
+        if not current_tour:
+            return True
+        return all(m.state == "Finished" for m in current_tour)
+
+    def advance_round(self) -> list[Match]:
+        """
+        Génère automatiquement le tour suivant si le tour en cours est terminé
+        et que le format le permet (SINGLE_ELIM, SWISS).
+        Ne fait rien et retourne une liste vide pour POOL, DOUBLE_ELIM,
+        ou si le tournoi de ce format est déjà arrivé à son terme.
+
+        Returns:
+            list[Match]: Les nouveaux matchs générés, ou liste vide si aucun
+                        tour supplémentaire n'a été généré.
+        """
+        if self.tournament_type not in (TournamentType.SINGLE_ELIM, TournamentType.SWISS):
+            return []
+
+        if not self.is_round_complete:
+            return []
+
+        try:
+            return self.next_round()
+        except RuntimeError:
+            # Le tournoi est terminé (single_elim : un seul gagnant restant)
+            # ou autre cas non bloquant — on n'avance simplement pas.
+            return []
+
+    def _update_byes(self) -> None:
+        """
+        Met à jour la liste des participants en attente d'un bye
+        (présents dans la phase mais absents du tour de matchs en cours,
+        typiquement à cause d'un nombre impair de participants).
+        """
+        if self.tournament_type == TournamentType.POOL:
+            self._bye_participants = []
+            return
+
+        current_tour = self._current_tour_matches() if self.matches else []
+        in_current_tour = set()
+        for m in current_tour:
+            for p in m.opponents:
+                in_current_tour.add(id(p))
+
+        if self.tournament_type == TournamentType.DOUBLE_ELIM:
+            # Tous les participants engagés dans n'importe quel match
+            engaged = set()
+            for m in self.matches:
+                for p in m.opponents:
+                    engaged.add(id(p))
+            self._bye_participants = [p for p in self.participants if id(p) not in engaged]
+        else:
+            self._bye_participants = [p for p in self.participants if id(p) not in in_current_tour]
 
     def standings(self) -> list[Participant]:
         """

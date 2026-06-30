@@ -1,0 +1,250 @@
+{
+  "version": "1.0",
+  "tournament": {
+    "name": "SII Tournament",
+    "sport": "Tennis de table",
+    "participant_type": "player",
+    "start_date": "2026-06-30",
+    "end_date": null,
+    "status": "ongoing",
+    "participants": [
+      {
+        "kind": "player",
+        "id": 0,
+        "name": "Axel",
+        "license_number": "LIC-AXE",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 1,
+        "name": "Gabin",
+        "license_number": "LIC-GAB",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 2,
+        "name": "Kylian",
+        "license_number": "LIC-KYL",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 3,
+        "name": "Valentin",
+        "license_number": "LIC-VAL",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 4,
+        "name": "Clément",
+        "license_number": "LIC-CLÉ",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 5,
+        "name": "Nathanaël",
+        "license_number": "LIC-NAT",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 6,
+        "name": "Théo",
+        "license_number": "LIC-THÉ",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 7,
+        "name": "Hugo",
+        "license_number": "LIC-HUG",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      }
+    ],
+    "phases": [
+      {
+        "name": "Phase de poule",
+        "tournament_type": "pool",
+        "num_qualifiers": 4,
+        "participant_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "pools": [
+          [
+            3,
+            0,
+            6,
+            7
+          ],
+          [
+            1,
+            2,
+            4,
+            5
+          ]
+        ],
+        "matches": [
+          {
+            "opponent_ids": [
+              3,
+              0
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              3,
+              6
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              3,
+              7
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              0,
+              6
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              0,
+              7
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              6,
+              7
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              1,
+              2
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              1,
+              4
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              1,
+              5
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              2,
+              4
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              2,
+              5
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          },
+          {
+            "opponent_ids": [
+              4,
+              5
+            ],
+            "score": [
+              0,
+              0
+            ],
+            "state": "About to start"
+          }
+        ]
+      }
+    ]
+  }
+}
