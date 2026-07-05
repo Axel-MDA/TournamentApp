@@ -1,0 +1,194 @@
+{
+  "version": "1.0",
+  "tournament": {
+    "name": "SII",
+    "sport": "Ping Pong",
+    "participant_type": "player",
+    "start_date": "2026-07-05",
+    "end_date": null,
+    "status": "upcoming",
+    "participants": [
+      {
+        "kind": "player",
+        "id": 0,
+        "name": "Axel",
+        "license_number": "LIC-AXE",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 1,
+        "name": "Gabin",
+        "license_number": "LIC-GAB",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 2,
+        "name": "Hugo",
+        "license_number": "LIC-HUG",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 3,
+        "name": "Nathanaël",
+        "license_number": "LIC-NAT",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 4,
+        "name": "Valentin",
+        "license_number": "LIC-VAL",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 5,
+        "name": "Thomas",
+        "license_number": "LIC-THO",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 6,
+        "name": "Kylian",
+        "license_number": "LIC-KYL",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 7,
+        "name": "Théo",
+        "license_number": "LIC-THÉ",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 8,
+        "name": "Thibaut",
+        "license_number": "LIC-THI",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 9,
+        "name": "Louise",
+        "license_number": "LIC-LOU",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 10,
+        "name": "Estelle",
+        "license_number": "LIC-EST",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 11,
+        "name": "Rachel",
+        "license_number": "LIC-RAC",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 12,
+        "name": "Benjamin",
+        "license_number": "LIC-BEN",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 13,
+        "name": "Pierre",
+        "license_number": "LIC-PIE",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 14,
+        "name": "Eva",
+        "license_number": "LIC-EVA",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 15,
+        "name": "Anaïs",
+        "license_number": "LIC-ANA",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 16,
+        "name": "Mélanie",
+        "license_number": "LIC-MÉL",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 17,
+        "name": "Anaëlle",
+        "license_number": "LIC-ANA",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 18,
+        "name": "Lucas",
+        "license_number": "LIC-LUC",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      },
+      {
+        "kind": "player",
+        "id": 19,
+        "name": "Etienne",
+        "license_number": "LIC-ETI",
+        "date_of_birth": "2000-01-01",
+        "handed": null,
+        "points": 0.0
+      }
+    ],
+    "phases": []
+  }
+}

@@ -17,8 +17,10 @@ from PyQt6.QtCore import Qt
 
 from models.config     import TournamentType
 from models.tournament import Tournament
-from .create_phase_dialog import CreatePhaseDialog
-from .pool_detail_dialog  import PoolDetailDialog
+from .create_phase_dialog  import CreatePhaseDialog
+from .pool_detail_dialog   import PoolDetailDialog
+from .bracket_detail_dialog import BracketDetailDialog
+from .delete_phase_dialog  import DeletePhaseDialog
 
 
 _TYPE_COLORS = {
@@ -100,6 +102,10 @@ class PhaseView(QWidget):
         if phase.tournament_type == TournamentType.POOL:
             dialog = PoolDetailDialog(phase, parent=self)
             dialog.exec()
+        elif phase.tournament_type == TournamentType.SINGLE_ELIM:
+            dialog = BracketDetailDialog(phase, parent=self)
+            dialog.exec()
+            self._refresh()  # les scores ont pu être saisis dans le bracket
         else:
             QMessageBox.information(
                 self, "Détail indisponible",
@@ -159,8 +165,12 @@ class PhaseView(QWidget):
         status_lbl  = QLabel(status_text)
         status_lbl.setStyleSheet("font-size: 12px; font-weight: 600;")
 
-        hint_lbl = QLabel("Voir détail →")
-        hint_lbl.setStyleSheet("font-size: 11px; color: #2980B9; font-weight: 600;")
+        btn_delete = QPushButton("✕")
+        btn_delete.setObjectName("btn_danger")
+        btn_delete.setFixedSize(32, 28)
+        btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_delete.setToolTip("Supprimer cette phase")
+        btn_delete.clicked.connect(lambda _, p=phase: self._on_delete_phase(p))
 
         c_layout.addWidget(badge)
         c_layout.addSpacing(12)
@@ -170,9 +180,21 @@ class PhaseView(QWidget):
         c_layout.addSpacing(16)
         c_layout.addWidget(status_lbl)
         c_layout.addSpacing(16)
-        c_layout.addWidget(hint_lbl)
+        c_layout.addWidget(btn_delete)
 
-        # Rend toute la carte cliquable
+        # Rend la carte cliquable pour ouvrir le détail, sauf sur le bouton supprimer
         card.mousePressEvent = lambda event, p=phase: self._on_phase_clicked(p)
 
         return card
+
+    def _on_delete_phase(self, phase):
+        if not self._tournament:
+            return
+
+        dialog = DeletePhaseDialog(phase.name, parent=self)
+        if dialog.exec():
+            try:
+                self._tournament.remove_phase(phase)
+                self._refresh()
+            except ValueError as e:
+                QMessageBox.warning(self, "Erreur", str(e))

@@ -131,13 +131,18 @@ def _phase_to_dict(phase: Phase, pid_map: dict) -> dict:
     ]
     participant_ids = [pid_map[id(p)] for p in phase.participants]
 
+    direct_byes = getattr(phase, "_direct_byes", [])
+    direct_bye_ids = [pid_map[id(p)] for p in direct_byes]
+
     return {
-        "name":            phase.name,
-        "tournament_type": phase.tournament_type.value,
-        "num_qualifiers":  phase.num_qualifiers,
-        "participant_ids": participant_ids,
-        "pools":           pools_ids,
-        "matches":         [_match_to_dict(m, pid_map) for m in phase.matches],
+        "name":             phase.name,
+        "tournament_type":  phase.tournament_type.value,
+        "num_qualifiers":   phase.num_qualifiers,
+        "participant_ids":  participant_ids,
+        "pools":            pools_ids,
+        "matches":          [_match_to_dict(m, pid_map) for m in phase.matches],
+        "round_sizes":      list(getattr(phase, "_round_sizes", [])),
+        "direct_bye_ids":   direct_bye_ids,
     }
 
 
@@ -271,6 +276,14 @@ def _phase_from_dict(data: dict, registry: dict) -> Phase:
     phase.matches = [
         _match_from_dict(m_data, registry)
         for m_data in data.get("matches", [])
+    ]
+
+    # Restaure la structure par tour (essentielle pour SINGLE_ELIM avec
+    # un premier tour de barrage de taille différente de n // 2) et les
+    # byes directs encore en attente d'intégration au tour principal.
+    phase._round_sizes = list(data.get("round_sizes", []))
+    phase._direct_byes = [
+        registry[pid] for pid in data.get("direct_bye_ids", [])
     ]
 
     # Recalcule les byes à partir de l'état réel des matchs rechargés

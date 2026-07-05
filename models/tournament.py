@@ -178,6 +178,30 @@ class Tournament:
         self.status = "ongoing"
         return phase
 
+    def remove_phase(self, phase: Phase) -> None:
+        """
+        Supprime une phase du tournoi.
+
+        Si la phase supprimée n'est pas la dernière, les phases suivantes
+        sont conservées telles quelles : leurs participants (qualifiés de
+        la phase supprimée) restent figés dans leur état au moment de
+        leur création. Le statut du tournoi repasse à 'upcoming' si plus
+        aucune phase ne subsiste.
+
+        Args:
+            phase (Phase): La phase à supprimer.
+
+        Raises:
+            ValueError: Si la phase n'appartient pas à ce tournoi.
+        """
+        if phase not in self.phases:
+            raise ValueError(f"La phase '{phase.name}' n'appartient pas à ce tournoi.")
+
+        self.phases.remove(phase)
+
+        if not self.phases:
+            self.status = "upcoming"
+
     @property
     def current_phase(self) -> Phase | None:
         """Retourne la phase en cours (dernière phase non terminée)."""

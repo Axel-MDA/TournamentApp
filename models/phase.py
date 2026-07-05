@@ -9,6 +9,7 @@ dans un Tournament — la suivante reçoit les qualifiés de la précédente.
 """
 from __future__ import annotations
 
+import random
 from typing import Union, TYPE_CHECKING
 
 from .config import TournamentType
@@ -37,6 +38,12 @@ class Phase:
         num_qualifiers   (int)                     : Qualifiés pour la phase suivante.
                                                      0 = phase finale.
         pools            (list[list[Participant]]) : Poules constituées (format POOL uniquement).
+        rounds_sizes     (list[int])                : Nombre de matchs prévu à chaque tour
+                                                      déjà généré (SINGLE_ELIM), dans l'ordre
+                                                      chronologique. Permet de découper
+                                                      correctement self.matches par tour
+                                                      même quand le premier tour (barrage)
+                                                      a une taille différente de n // 2.
     """
 
     def __init__(
@@ -77,6 +84,7 @@ class Phase:
         self.matches: list[Match]             = []
         self.pools:   list[list[Participant]] = []
         self._bye_participants: list[Participant] = []
+        self._round_sizes: list[int] = []
 
         for p in self.participants:
             p.points = 0.0
@@ -95,7 +103,25 @@ class Phase:
             self.pools, self.matches = gen_pool.generate(self.participants, num_pools)
 
         elif self.tournament_type == TournamentType.SINGLE_ELIM:
-            self.matches = gen_single_elim.generate(self.participants)
+            # Le plan (barrage / byes) est calculé une seule fois ici et
+            # partagé entre les matchs générés et les byes directs, pour
+            # garantir qu'un même participant ne puisse jamais se
+            # retrouver à la fois en barrage et en bye (ce qui se
+            # produisait quand chaque liste était calculée séparément
+            # avec son propre tirage aléatoire des égalités).
+            plan = gen_single_elim.build_bracket_plan(self.participants)
+
+            if plan.playin_players:
+                shuffled_playin = plan.playin_players[:]
+                random.shuffle(shuffled_playin)
+                self.matches = gen_single_elim._pair_up(shuffled_playin)
+            else:
+                shuffled = self.participants[:]
+                random.shuffle(shuffled)
+                self.matches = gen_single_elim._pair_up(shuffled)
+
+            self._round_sizes = [len(self.matches)]
+            self._direct_byes = list(plan.direct_byes)
 
         elif self.tournament_type == TournamentType.DOUBLE_ELIM:
             self.matches, _ = gen_double_elim.generate(self.participants)
@@ -107,6 +133,11 @@ class Phase:
         """
         Génère le tour suivant pour les formats multi-tours (SWISS, élimination directe).
         Pour POOL, tous les matchs sont générés dès le départ.
+
+        Pour SINGLE_ELIM, si le tour qui vient de se terminer était un tour
+        de barrage (play-in), les vainqueurs sont complétés par les
+        participants ayant reçu un bye direct avant de constituer le tour
+        principal.
 
         Returns:
             list[Match]: Les nouveaux matchs générés pour ce tour
@@ -123,8 +154,50 @@ class Phase:
 
         elif self.tournament_type == TournamentType.SINGLE_ELIM:
             current_tour = self._current_tour_matches()
-            new_matches  = gen_single_elim.next_round(current_tour)
+
+            if not current_tour:
+                raise RuntimeError("Aucun tour en cours à clôturer.")
+
+            unfinished = [m for m in current_tour if m.state != "Finished"]
+            if unfinished:
+                raise RuntimeError(
+                    f"{len(unfinished)} match(s) du tour précédent ne sont pas encore terminés."
+                )
+
+            # Garde anti double-génération : si le nombre de matchs déjà
+            # générés correspond exactement à un tournoi terminé (un seul
+            # vainqueur final), on ne doit plus jamais regénérer de tour.
+            if self.is_complete and len(current_tour) == 1:
+                raise RuntimeError("Le tournoi est terminé, il ne reste qu'un seul participant.")
+
+            # Calcule les vainqueurs UNIQUEMENT à partir des matchs de ce
+            # tour précis (current_tour), jamais de l'ensemble self.matches,
+            # pour garantir qu'aucun joueur éliminé à un tour antérieur ne
+            # puisse être réintégré par erreur.
+            current_tour_ids = {id(m) for m in current_tour}
+            winners = [
+                m.winner for m in self.matches
+                if id(m) in current_tour_ids and m.winner is not None
+            ]
+
+            # Si des byes directs sont en attente (premier tour = barrage
+            # qui vient de se terminer), on les intègre maintenant pour
+            # constituer le tour principal au complet. Ces byes ne sont
+            # consommés qu'une seule fois (vidés immédiatement après usage),
+            # ce qui empêche toute réintégration lors d'un appel ultérieur.
+            pending_byes = list(getattr(self, "_direct_byes", []))
+            if pending_byes:
+                pool = winners + pending_byes
+                self._direct_byes = []
+            else:
+                pool = winners
+
+            if len(pool) < 2:
+                raise RuntimeError("Le tournoi est terminé, il ne reste qu'un seul participant.")
+
+            new_matches = gen_single_elim._pair_up(pool)
             self.matches.extend(new_matches)
+            self._round_sizes.append(len(new_matches))
 
         elif self.tournament_type == TournamentType.SWISS:
             new_matches = gen_swiss.next_round(self.participants, self.matches)
@@ -135,11 +208,21 @@ class Phase:
 
     def _current_tour_matches(self) -> list[Match]:
         """
-        Retourne les matchs du tour en cours (les derniers non encore tous terminés).
+        Retourne les matchs du tour en cours.
+
+        Pour SINGLE_ELIM, s'appuie sur self._round_sizes (qui connaît la
+        vraie taille de chaque tour généré, y compris un éventuel premier
+        tour de barrage dont la taille diffère de n // 2). Pour les autres
+        formats, retombe sur l'ancienne heuristique (derniers matchs non
+        terminés, ou découpage par n // 2).
 
         Returns:
             list[Match]: Matchs du tour en cours.
         """
+        if self.tournament_type == TournamentType.SINGLE_ELIM and self._round_sizes:
+            last_size = self._round_sizes[-1]
+            return self.matches[-last_size:] if last_size else []
+
         unfinished = [m for m in self.matches if m.state != "Finished"]
         if unfinished:
             return unfinished
@@ -186,12 +269,20 @@ class Phase:
 
     def _update_byes(self) -> None:
         """
-        Met à jour la liste des participants en attente d'un bye
-        (présents dans la phase mais absents du tour de matchs en cours,
-        typiquement à cause d'un nombre impair de participants).
+        Met à jour la liste des participants actuellement en attente
+        d'un bye (qualifiés sans avoir à jouer le tour en cours).
+
+        Pour SINGLE_ELIM, reflète les byes directs déterminés à la
+        création de la phase (self._direct_byes), tant qu'ils n'ont pas
+        été intégrés au tour principal par next_round(). Pour les autres
+        formats, conserve l'ancienne heuristique par déduction.
         """
         if self.tournament_type == TournamentType.POOL:
             self._bye_participants = []
+            return
+
+        if self.tournament_type == TournamentType.SINGLE_ELIM:
+            self._bye_participants = list(getattr(self, "_direct_byes", []))
             return
 
         current_tour = self._current_tour_matches() if self.matches else []
